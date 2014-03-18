@@ -30,18 +30,28 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
+	def apiKey = ""
+
 	void setup(){
 		def api = "http://api.uptimerobot.com"
-		gurobotClient = GURobotClient.instance(api)
+		gurobotClient = GURobotClient.instance(api,apiKey)
 	}
-	
+
 
 	void "should retrieve list of monitors"() {
 		when:
 		def monitors = gurobotClient.getMonitors()
-		
+
 		then:
-		monitors.size() == 0
-}
-		
+		monitors.size() == 3
+	}
+
+	void "should retrieve monitor"() {
+		when:
+		def monitor = gurobotClient.getMonitorFor(776017935)
+		print monitor
+
+		then:
+		monitor.friendlyname == "cletasrobadas"
+	}
 }
