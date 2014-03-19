@@ -34,7 +34,7 @@ class Log {
 	 */
 	Date datetime
 
-	AlertContact alertcontact
+	List<AlertContact> alertcontact
 
 	@Override
 	public String toString() {

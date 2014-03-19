@@ -19,9 +19,14 @@
  */
 package org.gurobot.client
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import org.gurobot.client.alerts.AlertContact;
 import org.gurobot.client.alerts.AlertStatus;
 import org.gurobot.client.alerts.AlertType;
+import org.gurobot.client.logs.Log;
+import org.gurobot.client.logs.LogType;
 import org.gurobot.client.monitors.KeywordType;
 import org.gurobot.client.monitors.Monitor;
 import org.gurobot.client.monitors.MonitorType;
@@ -69,7 +74,7 @@ class GURobotClient {
 
 	List<Monitor> getMonitors(){
 		def monitors =[]
-		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1").json
+		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&logs=1&alertContacts=1").json
 		def monitor = response.monitors.monitor
 		monitor.each(){ data ->
 			monitors << parseMonitor(data)
@@ -98,9 +103,25 @@ class GURobotClient {
 			status = data.status?.isInteger()?Status.byId(data.status.toInteger()):null
 			alltimeuptimeratio = data.alltimeuptimeratio?.isFloat()?data.alltimeuptimeratio.toFloat():null
 			customuptimeratio = data.customuptimeratio
-			log = data.log
+			logs = parseLog(data.log)
 		}
 		monitor
+	}
+
+	private List<Log> parseLog(data){
+		def logList = []
+		def log
+		data.each(){ l->
+			log = new Log()
+			log.with {
+				type = l.type?.isInteger()?LogType.byId(l.type.toInteger()):null
+				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+				datetime = sdf.parse(l.datetime)
+				alertcontact = parseAlertContactLogs(l.alertcontact)
+			}
+			logList << log
+		}
+		logList
 	}
 
 	List<AlertContact> getAlertContacts(){
@@ -142,5 +163,19 @@ class GURobotClient {
 			status = alert.status?.isInteger()?AlertStatus.byId(alert.status.toInteger()):null
 		}
 		alertcontact
+	}
+
+	private List<AlertContact> parseAlertContactLogs(data){
+		def alertsContact = []
+		def alert
+		data.each(){ alrt ->
+			alert = new AlertContact()
+			alert.with {
+				value = alrt.value
+				type = alrt.type?.isInteger()?AlertType.byId(alrt.type.toInteger()):null
+			}
+			alertsContact << alert
+		}
+		alertsContact
 	}
 }

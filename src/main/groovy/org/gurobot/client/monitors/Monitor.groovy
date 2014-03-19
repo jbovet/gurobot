@@ -53,7 +53,7 @@ class Monitor {
 
 	String customuptimeratio
 
-	List<Log> log
+	List<Log> logs
 
 	@Override
 	public String toString() {
@@ -84,8 +84,8 @@ class Monitor {
 		builder.append(alltimeuptimeratio);
 		builder.append(", customuptimeratio=");
 		builder.append(customuptimeratio);
-		builder.append(", log=");
-		builder.append(log);
+		builder.append(", logs=");
+		builder.append(logs);
 		builder.append("]");
 		return builder.toString();
 	}

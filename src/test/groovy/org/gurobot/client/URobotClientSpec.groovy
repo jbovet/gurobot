@@ -40,21 +40,24 @@ class URobotClientSpec extends Specification {
 	}
 
 
-	void "should retrieve list of monitors"() {
-		when:
-		def monitors = gurobotClient.getMonitors()
-
-		then:
-		monitors.size() == 3
-	}
+//	void "should retrieve list of monitors"() {
+//		when:
+//		def monitors = gurobotClient.getMonitors()
+//
+//		then:
+//		monitors.size() == 3
+//	}
 
 	void "should retrieve monitor"() {
 		when:
-		def monitor = gurobotClient.getMonitorFor(776025713)
-		print monitor
+		def monitor = gurobotClient.getMonitorFor(776025715)
+		def logs = monitor.logs
+		logs.each(){
+				print "\n"+it.datetime + " - "+it.type + " - "+it.alertcontact
+		}
 
 		then:
-		monitor.type == MonitorType.HTTP
+		monitor.type in MonitorType.values()
 	}
 
 	void "should retrieve list of alert contacts"() {
