@@ -26,34 +26,34 @@ package org.gurobot.client.monitors
 class Monitor {
 
 	Integer id
-	
+
 	String friendlyname
-	
+
 	String url
-	
-	Integer type
-	
-	Integer subtype;
-	
-	Integer keywordtype;
-	
+
+	MonitorType type
+
+	SubType subtype;
+
+	KeywordType keywordtype;
+
 	String keywordvalue
-	
+
 	String httpusername
-	
+
 	String httppassword
-	
+
 	Integer port
-	
-	Integer status
-	
+
+	Status status
+
 	Float alltimeuptimeratio
-	
+
 	String customuptimeratio
-	 	
+
 	String log
 
-		@Override
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Monitor [id=");
@@ -87,5 +87,4 @@ class Monitor {
 		builder.append("]");
 		return builder.toString();
 	}
-
 }

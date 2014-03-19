@@ -22,7 +22,11 @@ package org.gurobot.client
 import org.gurobot.client.alerts.AlertContact;
 import org.gurobot.client.alerts.AlertStatus;
 import org.gurobot.client.alerts.AlertType;
+import org.gurobot.client.monitors.KeywordType;
 import org.gurobot.client.monitors.Monitor;
+import org.gurobot.client.monitors.MonitorType;
+import org.gurobot.client.monitors.Status;
+import org.gurobot.client.monitors.SubType;
 
 import sun.security.krb5.internal.APOptions;
 import wslite.http.HTTPClientException;
@@ -84,14 +88,14 @@ class GURobotClient {
 			id =  data.id?.isInteger()?data.id.toInteger():null
 			friendlyname = data.friendlyname
 			url = data.url
-			type = data.type?.isInteger()?data.type.toInteger():null
-			subtype = data.subtype?.isInteger()?data.subtype.toInteger():null
-			keywordtype = data.keywordtype?.isInteger()?data.keywordtype.toInteger():null
+			type = data.type?.isInteger()?MonitorType.byId(data.type.toInteger()):null
+			subtype = data.subtype?.isInteger()?SubType.byId(data.subtype.toInteger()):null
+			keywordtype = data.keywordtype?.isInteger()?KeywordType.byId(data.keywordtype.toInteger()):null
 			keywordvalue = data.keywordvalue
 			httpusername = data.httpusername
 			httppassword = data.httppassword
 			port = data.port?.isInteger()?data.port.toInteger():null
-			status = data.status?.isInteger()?data.status.toInteger():null
+			status = data.status?.isInteger()?Status.byId(data.status.toInteger()):null
 			alltimeuptimeratio = data.alltimeuptimeratio?.isFloat()?data.alltimeuptimeratio.toFloat():null
 			customuptimeratio = data.customuptimeratio
 		}

@@ -22,6 +22,7 @@ package org.gurobot.client
 import spock.lang.Specification
 import org.gurobot.client.GURobotClient
 import org.gurobot.client.alerts.AlertType;
+import org.gurobot.client.monitors.MonitorType;
 
 /**
  * @author josebovet
@@ -31,7 +32,7 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = "u121322-021b5cd9f36e49a637df719e"
+	def apiKey = ""
 
 	void setup(){
 		def api = "http://api.uptimerobot.com"
@@ -50,9 +51,11 @@ class URobotClientSpec extends Specification {
 	void "should retrieve monitor"() {
 		when:
 		def monitor = gurobotClient.getMonitorFor(776017935)
+		print monitor
 
 		then:
 		monitor.friendlyname == "cletasrobadas"
+		monitor.type == MonitorType.HTTP
 	}
 
 	void "should retrieve list of alert contacts"() {
@@ -66,7 +69,7 @@ class URobotClientSpec extends Specification {
 	void "should retrieve one alert contacts"() {
 		when:
 		def alert = gurobotClient.getAlertContactFor("2253041")
-		print alert
+
 		then:
 		alert.value == 'josebovet'
 		alert.type == AlertType.TWITTER
