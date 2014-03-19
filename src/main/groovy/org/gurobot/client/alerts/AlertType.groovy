@@ -17,27 +17,28 @@
 /**
  * 
  */
-package org.gurobot.client
+package org.gurobot.client.alerts
 
 /**
+ * SMS(1),EMAI(2),TWITTER(3),BOXCAR(4),WEBHOOK(5)
  * @author josebovet
  *
  */
-class AlertContact {
+enum AlertType {
 
-	String id
+	SMS(1),EMAIL(2),TWITTER(3),BOXCAR(4),WEBHOOK(5)
 
-	String value
+	AlertType(int value) {
+		this.value = value
+	}
 
-	Integer type
+	private int value
 
-	Integer status
+	public int value() {
+		return value
+	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("AlertContact [id=").append(id).append(", value=").append(value).append(", type=").append(type)
-				.append(", status=").append(status).append("]");
-		return builder.toString();
+	static AlertType byId(int id) {
+		values().find { it.value == id }
 	}
 }

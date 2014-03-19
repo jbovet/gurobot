@@ -21,6 +21,7 @@ package org.gurobot.client
 
 import spock.lang.Specification
 import org.gurobot.client.GURobotClient
+import org.gurobot.client.alerts.AlertType;
 
 /**
  * @author josebovet
@@ -30,7 +31,7 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = ""
+	def apiKey = "u121322-021b5cd9f36e49a637df719e"
 
 	void setup(){
 		def api = "http://api.uptimerobot.com"
@@ -65,9 +66,10 @@ class URobotClientSpec extends Specification {
 	void "should retrieve one alert contacts"() {
 		when:
 		def alert = gurobotClient.getAlertContactFor("2253041")
-
+		print alert
 		then:
 		alert.value == 'josebovet'
+		alert.type == AlertType.TWITTER
 	}
 
 	void "should retrieve two alert contacts"() {

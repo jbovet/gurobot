@@ -17,7 +17,7 @@
 /**
  * 
  */
-package org.gurobot.client
+package org.gurobot.client.monitors
 
 /**
  * @author josebovet

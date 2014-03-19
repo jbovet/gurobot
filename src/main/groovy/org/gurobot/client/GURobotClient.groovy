@@ -19,6 +19,11 @@
  */
 package org.gurobot.client
 
+import org.gurobot.client.alerts.AlertContact;
+import org.gurobot.client.alerts.AlertStatus;
+import org.gurobot.client.alerts.AlertType;
+import org.gurobot.client.monitors.Monitor;
+
 import sun.security.krb5.internal.APOptions;
 import wslite.http.HTTPClientException;
 import wslite.json.JSONObject;
@@ -128,8 +133,8 @@ class GURobotClient {
 		alertcontact.with {
 			id = alert.id
 			value = alert.value
-			type = alert.type?.isInteger()?alert.type.toInteger():null
-			status = alert.status?.isInteger()?alert.status.toInteger():null
+			type = alert.type?.isInteger()?AlertType.byId(alert.type.toInteger()):null
+			status = alert.status?.isInteger()?AlertStatus.byId(alert.status.toInteger()):null
 		}
 		alertcontact
 	}
