@@ -49,9 +49,19 @@ class URobotClientSpec extends Specification {
 	void "should retrieve monitor"() {
 		when:
 		def monitor = gurobotClient.getMonitorFor(776017935)
-		print monitor
 
 		then:
 		monitor.friendlyname == "cletasrobadas"
+	}
+
+	void "should retrieve list of alert contacts"() {
+		when:
+		def alerts = gurobotClient.getAlertContacts()
+		alerts.each(){
+			print it
+		}
+		
+		then:
+		alerts.size() == 2
 	}
 }

@@ -21,8 +21,11 @@ package org.gurobot.client
 
 import sun.security.krb5.internal.APOptions;
 import wslite.http.HTTPClientException;
+import wslite.json.JSONObject;
+import wslite.rest.ContentType;
 import wslite.rest.RESTClient
 import wslite.rest.Response;
+import wslite.rest.ResponseBuilder;
 
 /**
  * 
@@ -47,7 +50,6 @@ class GURobotClient {
 
 	private Response call(String path) throws GURobotClientException {
 		try {
-			restClient.defaultContentTypeHeader = "application/json"
 			restClient.get(path: path)
 		} catch (HTTPClientException hce) {
 			throw new GURobotClientException("Problems communicating with: $path", hce)
@@ -66,7 +68,7 @@ class GURobotClient {
 
 	Monitor getMonitorFor(Integer id){
 		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&monitors=$id").json
-		return parseMonitor(response.monitors.monitor.first())
+		parseMonitor(response.monitors.monitor.first())
 	}
 
 	private Monitor parseMonitor(data){
@@ -87,5 +89,40 @@ class GURobotClient {
 			customuptimeratio = data.customuptimeratio
 		}
 		monitor
+	}
+
+	List<AlertContact> getAlertContacts(){
+		def alertcontacts =[]
+		def data = call("getAlertContacts?apiKey=${apikey}&format=json&noJsonCallback=1")
+		def alerts
+		if(data.response.contentType?.startsWith('text/')){
+			JSONObject json = new JSONObject(data.text)
+			alerts = json.alertcontacts.alertcontact
+		}else
+			alerts = data.alertcontacts.alertcontact
+
+		alerts.each(){ alert ->
+			alertcontacts << parseAlertContact(alert)
+		}
+		alertcontacts
+	}
+
+	AlertContact getAlertContactFor(String id){
+		def response = call("getAlertContacts?apiKey=${apikey}&alertcontacts=$id&format=json&noJsonCallback=1").json
+		parseAlertContact(response.alertcontacts.alertcontact.first())
+	}
+
+	AlertContact getAlertContactFor(String[] ids){
+	}
+
+	private AlertContact parseAlertContact(alert){
+		def alertcontact = new AlertContact()
+		alertcontact.with {
+			id = alert.id
+			value = alert.value
+			type = alert.type?.isInteger()?alert.type.toInteger():null
+			status = alert.status?.isInteger()?alert.status.toInteger():null
+		}
+		alertcontact
 	}
 }
