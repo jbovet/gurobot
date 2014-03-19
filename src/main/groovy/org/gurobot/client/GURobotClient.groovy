@@ -78,7 +78,7 @@ class GURobotClient {
 	}
 
 	Monitor getMonitorFor(Integer id){
-		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&monitors=$id").json
+		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&monitors=$id&logs=1&alertContacts=1").json
 		parseMonitor(response.monitors.monitor.first())
 	}
 
@@ -98,6 +98,7 @@ class GURobotClient {
 			status = data.status?.isInteger()?Status.byId(data.status.toInteger()):null
 			alltimeuptimeratio = data.alltimeuptimeratio?.isFloat()?data.alltimeuptimeratio.toFloat():null
 			customuptimeratio = data.customuptimeratio
+			log = data.log
 		}
 		monitor
 	}

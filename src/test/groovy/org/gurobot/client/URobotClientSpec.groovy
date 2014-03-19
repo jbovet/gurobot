@@ -50,11 +50,10 @@ class URobotClientSpec extends Specification {
 
 	void "should retrieve monitor"() {
 		when:
-		def monitor = gurobotClient.getMonitorFor(776017935)
+		def monitor = gurobotClient.getMonitorFor(776025713)
 		print monitor
 
 		then:
-		monitor.friendlyname == "cletasrobadas"
 		monitor.type == MonitorType.HTTP
 	}
 

@@ -19,6 +19,8 @@
  */
 package org.gurobot.client.monitors
 
+import org.gurobot.client.logs.Log;
+
 /**
  * @author josebovet
  *
@@ -51,7 +53,7 @@ class Monitor {
 
 	String customuptimeratio
 
-	String log
+	List<Log> log
 
 	@Override
 	public String toString() {
