@@ -57,10 +57,24 @@ class URobotClientSpec extends Specification {
 	void "should retrieve list of alert contacts"() {
 		when:
 		def alerts = gurobotClient.getAlertContacts()
-		alerts.each(){
-			print it
-		}
-		
+
+		then:
+		alerts.size() == 2
+	}
+
+	void "should retrieve one alert contacts"() {
+		when:
+		def alert = gurobotClient.getAlertContactFor("2253041")
+
+		then:
+		alert.value == 'josebovet'
+	}
+
+	void "should retrieve two alert contacts"() {
+		when:
+		def ids = ["2253041", "0121322"]
+		def alerts = gurobotClient.getAlertContactFor(ids)
+
 		then:
 		alerts.size() == 2
 	}

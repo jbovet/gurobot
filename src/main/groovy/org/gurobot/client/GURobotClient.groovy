@@ -40,6 +40,8 @@ class GURobotClient {
 
 	static apikey = ""
 
+	static LIST_SEPARATOR = "-"
+
 	private GURobotClient() {
 	}
 
@@ -92,27 +94,33 @@ class GURobotClient {
 	}
 
 	List<AlertContact> getAlertContacts(){
-		def alertcontacts =[]
 		def data = call("getAlertContacts?apiKey=${apikey}&format=json&noJsonCallback=1")
-		def alerts
+		getAlerts(data)
+	}
+
+	AlertContact getAlertContactFor(String id){
+		getAlertContactFor([id]).first()
+	}
+
+	List<AlertContact> getAlertContactFor(List ids){
+		def list = ids.join('-')
+		def data = call("getAlertContacts?apiKey=${apikey}&alertcontacts=$list&format=json&noJsonCallback=1")
+		getAlerts(data)
+	}
+
+	private List getAlerts(data) {
+		def alerts = []
 		if(data.response.contentType?.startsWith('text/')){
 			JSONObject json = new JSONObject(data.text)
 			alerts = json.alertcontacts.alertcontact
 		}else
 			alerts = data.alertcontacts.alertcontact
 
+		def alertcontacts = []
 		alerts.each(){ alert ->
 			alertcontacts << parseAlertContact(alert)
 		}
 		alertcontacts
-	}
-
-	AlertContact getAlertContactFor(String id){
-		def response = call("getAlertContacts?apiKey=${apikey}&alertcontacts=$id&format=json&noJsonCallback=1").json
-		parseAlertContact(response.alertcontacts.alertcontact.first())
-	}
-
-	AlertContact getAlertContactFor(String[] ids){
 	}
 
 	private AlertContact parseAlertContact(alert){
