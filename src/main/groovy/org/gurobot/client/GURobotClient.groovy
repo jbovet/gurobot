@@ -64,26 +64,102 @@ class GURobotClient {
 		new GURobotClient(restClient: new RESTClient(apiUrl))
 	}
 
-	private Response call(String path) throws GURobotClientException {
+	private Response call(path, Map query =[:]) throws GURobotClientException {
 		try {
-			restClient.get(path: path)
+			query << ['format':'json','noJsonCallback':1]
+			restClient.get(path: path, query:query)
 		} catch (HTTPClientException hce) {
 			throw new GURobotClientException("Problems communicating with: $path", hce)
 		}
 	}
 
-	List<Monitor> getMonitors() throws GURobotClientException {
-		def monitors =[]
-		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&logs=1&alertContacts=1").json
+	/***
+	 * @param monitors monitor list
+	 * @param log return log 
+	 * @param alertcontacts return alert contacts
+	 * @param responseTimes response time data 
+	 * @param responseTimesAverage not yet implemented
+	 * @param showMonitorAlertContacts not yet implemented
+	 * @param showTimeZone not yet implemented
+	 * @return
+	 * @throws GURobotClientException
+	 */
+	List<Monitor> getMonitors(List monitors = [], boolean log, boolean alertcontacts, boolean responseTimes, boolean responseTimesAverage, boolean showMonitorAlertContacts, boolean showTimeZone) throws GURobotClientException {
+		def monitorList =[]
+		def params= [:]
+
+		if(!monitors.isEmpty()){
+			def list = monitors.join('-')
+			params << ['monitors':list]
+		}
+
+		if(log) params << ['logs':log?1:0]
+
+		if(alertcontacts && log) params << ['alertcontacts':alertcontacts?1:0]
+
+		if(responseTimes) params << ['responseTimes':responseTimes?1:0]
+
+		if(responseTimesAverage) params << ['responseTimesAverage':responseTimesAverage?1:0]
+
+		if(showMonitorAlertContacts) params << ['showMonitorAlertContacts':showMonitorAlertContacts?1:0]
+
+		if(showTimeZone) params << ['showTimeZone':showTimeZone?1:0]
+
+		def response =  call("getMonitors?apiKey=${apikey}", params).json
 		def monitor = response.monitors.monitor
 		monitor.each(){ data ->
-			monitors << parseMonitor(data)
+			monitorList << parseMonitor(data)
 		}
-		monitors
+		monitorList
 	}
 
+	/***
+	 *  Get Logs, alerts contacts and response time data of each monitor
+	 * @param monitors monitor list
+	 * @param log return log
+	 * @param alertcontacts return alert contacts
+	 * @param responseTimes response time data 
+	 * @return
+	 * @throws GURobotClientException
+	 */
+	List<Monitor> getMonitors(List monitors =[], boolean log, boolean alertcontacts, boolean responseTimes) throws GURobotClientException {
+		getMonitors(monitors, log, alertcontacts,responseTimes, false, false, false);
+	}
+
+	/***
+	 * Get Logs and alerts contacts of each monitor 
+	 * @param monitors monitor list
+	 * @param alertcontacts false just will return log | true logs + alert contacts
+	 * @return
+	 * @throws GURobotClientException
+	 */
+	List<Monitor> getMonitors(List monitors = [], boolean alertcontacts) throws GURobotClientException {
+		getMonitors(monitors, true, alertcontacts, false, false, false,false)
+	}
+
+	/***
+	 * 
+	 * Get Logs and alerts contacts for all monitors
+	 * @return logs and alerts contacts
+	 * @throws GURobotClientException
+	 */
+	List<Monitor> getMonitors() throws GURobotClientException {
+		getMonitors([],true, true,false, false, false,false);
+	}
+
+	/***
+	 * Get specific monitors by id list
+	 * @param list of monitors
+	 * @return logs and alerts contacts
+	 * @throws GURobotClientException
+	 */
+	List<Monitor> getMonitors(List monitors) throws GURobotClientException {
+		getMonitors(monitors,true, true,false, false, false,false);
+	}
+
+
 	Monitor getMonitorFor(Integer id){
-		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&monitors=$id&logs=1&alertContacts=1").json
+		def response =  call("getMonitors?apiKey=${apikey}&monitors=$id").json
 		parseMonitor(response.monitors.monitor.first())
 	}
 
@@ -125,7 +201,7 @@ class GURobotClient {
 	}
 
 	List<AlertContact> getAlertContacts(){
-		def data = call("getAlertContacts?apiKey=${apikey}&format=json&noJsonCallback=1")
+		def data = call("getAlertContacts?apiKey=${apikey}")
 		getAlerts(data)
 	}
 
@@ -135,9 +211,10 @@ class GURobotClient {
 
 	List<AlertContact> getAlertContactFor(List ids){
 		def list = ids.join('-')
-		def data = call("getAlertContacts?apiKey=${apikey}&alertcontacts=$list&format=json&noJsonCallback=1")
+		def data = call("getAlertContacts?apiKey=${apikey}&alertcontacts=$list")
 		getAlerts(data)
 	}
+
 
 	private List getAlerts(data) {
 		def alerts = []
