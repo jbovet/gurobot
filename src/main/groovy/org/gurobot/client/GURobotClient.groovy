@@ -22,6 +22,7 @@ package org.gurobot.client
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.codehaus.groovy.runtime.metaclass.MethodMetaProperty.GetMethodMetaProperty;
 import org.gurobot.client.alerts.AlertContact;
 import org.gurobot.client.alerts.AlertStatus;
 import org.gurobot.client.alerts.AlertType;
@@ -158,6 +159,13 @@ class GURobotClient {
 	}
 
 
+	/***
+	 * Get monitor for Id
+	 * @deprecated use {@link getMonitors(List ids)}
+	 * @param id
+	 * @return monitor
+	 */
+	@Deprecated
 	Monitor getMonitorFor(Integer id){
 		def response =  call("getMonitors?apiKey=${apikey}&monitors=$id").json
 		parseMonitor(response.monitors.monitor.first())
