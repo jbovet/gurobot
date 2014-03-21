@@ -21,6 +21,7 @@ package org.gurobot.client
 
 import spock.lang.Specification
 import org.gurobot.client.GURobotClient
+import org.gurobot.client.alerts.AlertStatus;
 import org.gurobot.client.alerts.AlertType;
 import org.gurobot.client.monitors.MonitorType;
 import wslite.http.HTTPClientException
@@ -96,17 +97,17 @@ class URobotClientSpec extends Specification {
 
 	void "should retrieve one alert contacts"() {
 		when:
-		def alert = gurobotClient.getAlertContactFor("2253041")
+		def alert = gurobotClient.getAlertContacts([2253041]).first()
 
 		then:
-		alert.value == 'josebovet'
+		alert.status == AlertStatus.ACTIVE
 		alert.type == AlertType.TWITTER
 	}
 
 	void "should retrieve two alert contacts"() {
 		when:
 		def ids = ["2253041", "0121322"]
-		def alerts = gurobotClient.getAlertContactFor(ids)
+		def alerts = gurobotClient.getAlertContacts(ids)
 
 		then:
 		alerts.size() == 2

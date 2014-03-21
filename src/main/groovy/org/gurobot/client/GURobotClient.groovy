@@ -65,6 +65,12 @@ class GURobotClient {
 		new GURobotClient(restClient: new RESTClient(apiUrl))
 	}
 
+	/***
+	 * Get method 
+	 * @param path 
+	 * @query parameters
+	 * @return response
+	 */
 	private Response call(path, Map query =[:]) throws GURobotClientException {
 		try {
 			query << ['format':'json','noJsonCallback':1]
@@ -166,8 +172,12 @@ class GURobotClient {
 	 * @return monitor
 	 */
 	@Deprecated
-	Monitor getMonitorFor(Integer id){
-		def response =  call("getMonitors?apiKey=${apikey}&monitors=$id").json
+	Monitor getMonitorFor(int id){
+		def params= [:]
+		if(id){
+			params << ["monitors":id]
+		}
+		def response =  call("getMonitors?apiKey=${apikey}", params).json
 		parseMonitor(response.monitors.monitor.first())
 	}
 
@@ -208,19 +218,19 @@ class GURobotClient {
 		logList
 	}
 
-	List<AlertContact> getAlertContacts(){
-		def data = call("getAlertContacts?apiKey=${apikey}")
-		getAlerts(data)
-	}
 
-	AlertContact getAlertContactFor(String id){
-		getAlertContactFor([id]).first()
-	}
+	/***
+	 * Get alert contacts list by id(s)
+	 * @return
+	 */
+	List<AlertContact> getAlertContacts(List ids = []){
+		def params= [:]
 
-	List<AlertContact> getAlertContactFor(List ids){
-		def list = ids.join('-')
-		def data = call("getAlertContacts?apiKey=${apikey}&alertcontacts=$list")
-		getAlerts(data)
+		if(!ids.isEmpty()){
+			def list = ids.join('-')
+			params << ["alertcontacts":list]
+		}
+		getAlerts(call("getAlertContacts?apiKey=${apikey}",params))
 	}
 
 
