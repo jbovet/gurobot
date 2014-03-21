@@ -23,6 +23,8 @@ import spock.lang.Specification
 import org.gurobot.client.GURobotClient
 import org.gurobot.client.alerts.AlertType;
 import org.gurobot.client.monitors.MonitorType;
+import wslite.http.HTTPClientException
+import wslite.rest.RESTClient
 
 /**
  * @author josebovet

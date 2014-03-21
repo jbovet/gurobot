@@ -72,7 +72,7 @@ class GURobotClient {
 		}
 	}
 
-	List<Monitor> getMonitors(){
+	List<Monitor> getMonitors() throws GURobotClientException {
 		def monitors =[]
 		def response =  call("getMonitors?apiKey=${apikey}&format=json&noJsonCallback=1&logs=1&alertContacts=1").json
 		def monitor = response.monitors.monitor
