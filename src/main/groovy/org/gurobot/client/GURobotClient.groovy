@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.gurobot.client
 
@@ -30,6 +30,8 @@ import org.gurobot.client.logs.Log;
 import org.gurobot.client.logs.LogType;
 import org.gurobot.client.monitors.KeywordType;
 import org.gurobot.client.monitors.Monitor;
+import org.gurobot.client.monitors.MonitorParameter;
+import org.gurobot.client.monitors.MonitorParameter.MonitorParameterBuilder;
 import org.gurobot.client.monitors.MonitorType;
 import org.gurobot.client.monitors.Status;
 import org.gurobot.client.monitors.SubType;
@@ -43,7 +45,7 @@ import wslite.rest.Response;
 import wslite.rest.ResponseBuilder;
 
 /**
- * 
+ *
  * @author josebovet
  *
  */
@@ -66,8 +68,8 @@ class GURobotClient {
 	}
 
 	/***
-	 * Get method 
-	 * @param path 
+	 * Get method
+	 * @param path
 	 * @query parameters
 	 * @return response
 	 */
@@ -82,9 +84,9 @@ class GURobotClient {
 
 	/***
 	 * @param monitors monitor list
-	 * @param log return log 
+	 * @param log return log
 	 * @param alertcontacts return alert contacts
-	 * @param responseTimes response time data 
+	 * @param responseTimes response time data
 	 * @param responseTimesAverage not yet implemented
 	 * @param showMonitorAlertContacts not yet implemented
 	 * @param showTimeZone not yet implemented
@@ -125,7 +127,7 @@ class GURobotClient {
 	 * @param monitors monitor list
 	 * @param log return log
 	 * @param alertcontacts return alert contacts
-	 * @param responseTimes response time data 
+	 * @param responseTimes response time data
 	 * @return
 	 * @throws GURobotClientException
 	 */
@@ -134,7 +136,7 @@ class GURobotClient {
 	}
 
 	/***
-	 * Get Logs and alerts contacts of each monitor 
+	 * Get Logs and alerts contacts of each monitor
 	 * @param monitors monitor list
 	 * @param alertcontacts false just will return log | true logs + alert contacts
 	 * @return
@@ -145,7 +147,7 @@ class GURobotClient {
 	}
 
 	/***
-	 * 
+	 *
 	 * Get Logs and alerts contacts for all monitors
 	 * @return logs and alerts contacts
 	 * @throws GURobotClientException
@@ -162,6 +164,26 @@ class GURobotClient {
 	 */
 	List<Monitor> getMonitors(List monitors) throws GURobotClientException {
 		getMonitors(monitors,true, true,false, false, false,false);
+	}
+
+	/***
+	 * 
+	 * @param monitorParameter
+	 * @return
+	 * @throws GURobotClientException
+	 */
+	int newMonitor(MonitorParameter monitorParameter) throws GURobotClientException{
+		def params = monitorParameter.asMap()
+		if(monitorParameter.monitorType == MonitorType.PORT.value() && SubType.byId(monitorParameter.monitorSubType) in SubType.values())
+			params['monitorSubType'] = monitorParameter.monitorSubType
+		else params.remove('monitorSubType')
+
+		if(monitorParameter.monitorType == MonitorType.PORT && monitorParameter.monitorPort)
+			params['monitorPort'] = monitorParameter.monitorPort
+		else params.remove('monitorPort')
+
+		def response =  call("newMonitor?apiKey=${apikey}", params).json
+		return response.monitor.id.toInteger()
 	}
 
 

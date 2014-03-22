@@ -15,17 +15,18 @@
  */
 
 /**
- * 
+ *
  */
 package org.gurobot.client
 
+import org.gurobot.client.alerts.AlertStatus
+import org.gurobot.client.alerts.AlertType
+import org.gurobot.client.monitors.MonitorParameter
+import org.gurobot.client.monitors.MonitorType
+import org.gurobot.client.monitors.MonitorParameter.MonitorParameterBuilder
+import org.gurobot.client.monitors.SubType;
+
 import spock.lang.Specification
-import org.gurobot.client.GURobotClient
-import org.gurobot.client.alerts.AlertStatus;
-import org.gurobot.client.alerts.AlertType;
-import org.gurobot.client.monitors.MonitorType;
-import wslite.http.HTTPClientException
-import wslite.rest.RESTClient
 
 /**
  * @author josebovet
@@ -35,7 +36,7 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = ""
+	def apiKey = "u121322-021b5cd9f36e49a637df719e"
 
 	void setup(){
 		def api = "http://api.uptimerobot.com"
@@ -85,6 +86,23 @@ class URobotClientSpec extends Specification {
 
 		then:
 		monitor.type in MonitorType.values()
+	}
+
+	void "should add new monitor"(){
+		MonitorParameter m = new MonitorParameterBuilder()
+				.monitorFriendlyName("api-test")
+				.monitorURL("http://duoc.cl")
+				.monitorType(MonitorType.PORT)
+				.monitorSubType(SubType.HTTP)
+				.build()
+
+		when:
+		def id  = gurobotClient.newMonitor(m)
+
+		then:
+		id > 0
+
+
 	}
 
 	void "should retrieve list of alert contacts"() {
