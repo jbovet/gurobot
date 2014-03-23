@@ -21,6 +21,7 @@ package org.gurobot.client
 
 import org.gurobot.client.alerts.AlertStatus
 import org.gurobot.client.alerts.AlertType
+import org.gurobot.client.monitors.KeywordType;
 import org.gurobot.client.monitors.MonitorParameter
 import org.gurobot.client.monitors.MonitorType
 import org.gurobot.client.monitors.MonitorParameter.MonitorParameterBuilder
@@ -36,7 +37,7 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = "u121322-021b5cd9f36e49a637df719e"
+	def apiKey = ""
 
 	void setup(){
 		def api = "http://api.uptimerobot.com"
@@ -90,10 +91,14 @@ class URobotClientSpec extends Specification {
 
 	void "should add new monitor"(){
 		MonitorParameter m = new MonitorParameterBuilder()
-				.monitorFriendlyName("api-test")
+				.monitorFriendlyName("api-test9")
 				.monitorURL("http://duoc.cl")
-				.monitorType(MonitorType.PORT)
-				.monitorSubType(SubType.HTTP)
+				.monitorType(MonitorType.HTTP)
+				.monitorSubType(SubType.HTTPS)
+				.monitorKeywordType(KeywordType.NOT_EXISTS)
+				.monitorKeywordValue("blah!")
+				.monitorHTTPUsername("pepe")
+				.monitorHTTPPassword("pepe".reverse())
 				.build()
 
 		when:
@@ -101,9 +106,25 @@ class URobotClientSpec extends Specification {
 
 		then:
 		id > 0
-
-
 	}
+
+	void "should add new monitor with alerts contacts"() {
+		MonitorParameter m = new MonitorParameterBuilder()
+				.monitorFriendlyName("api-test10")
+				.monitorURL("http://www.duoc.cl")
+				.monitorType(MonitorType.HTTP)
+				.monitorAlertContacts(["2253041","0121322"])
+				.build()
+
+		when:
+		def id  = gurobotClient.newMonitor(m)
+
+		then:
+		id > 0
+	}
+
+
+
 
 	void "should retrieve list of alert contacts"() {
 		when:

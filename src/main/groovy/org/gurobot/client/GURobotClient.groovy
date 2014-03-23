@@ -174,15 +174,29 @@ class GURobotClient {
 	 */
 	int newMonitor(MonitorParameter monitorParameter) throws GURobotClientException{
 		def params = monitorParameter.asMap()
-		if(monitorParameter.monitorType == MonitorType.PORT.value() && SubType.byId(monitorParameter.monitorSubType) in SubType.values())
-			params['monitorSubType'] = monitorParameter.monitorSubType
+		if(monitorParameter?.monitorType == MonitorType.PORT.value() && SubType.byId(monitorParameter?.monitorSubType) in SubType.values())
+			params['monitorSubType'] = monitorParameter?.monitorSubType
 		else params.remove('monitorSubType')
 
-		if(monitorParameter.monitorType == MonitorType.PORT && monitorParameter.monitorPort)
-			params['monitorPort'] = monitorParameter.monitorPort
+		if(monitorParameter?.monitorType == MonitorType.PORT.value() && monitorParameter?.monitorPort)
+			params['monitorPort'] = monitorParameter?.monitorPort
 		else params.remove('monitorPort')
 
+		if(monitorParameter?.monitorKeywordType == KeywordType.EXISTS.value() && monitorParameter?.monitorKeywordValue){
+			params['monitorKeywordType'] = monitorParameter?.monitorKeywordType
+			params['monitorKeywordValue'] = monitorParameter?.monitorKeywordValue
+		}else{
+			params.remove('monitorKeywordType')
+			params.remove('monitorKeywordValue')
+		}
+
+		def list = monitorParameter?.monitorAlertContacts?.join('-')
+		if(!list?.isEmpty())
+			params << ["monitorAlertContacts":list]
+
+		print "params=> "+params
 		def response =  call("newMonitor?apiKey=${apikey}", params).json
+		print response
 		return response.monitor.id.toInteger()
 	}
 

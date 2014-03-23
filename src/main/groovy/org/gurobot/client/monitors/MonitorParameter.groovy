@@ -7,15 +7,52 @@ package org.gurobot.client.monitors;
  *
  */
 class MonitorParameter {
+	/***
+	 * required
+	 */
 	String monitorFriendlyName;
+
+	/***
+	 * required
+	 */
 	String monitorURL;
+
+	/***
+	 * required
+	 */
 	Integer monitorType;
+
+	/***
+	 * optional (required for port monitoring)
+	 */
 	Integer monitorSubType;
+
+	/***
+	 *  optional (required for port monitoring)
+	 */
 	Integer monitorPort;
+
+	/***
+	 * optional (required for keyword monitoring)
+	 */
 	Integer monitorKeywordType;
+
+	/***
+	 * optional (required for keyword monitoring)
+	 */
 	String monitorKeywordValue;
+	/***
+	 *  optional
+	 */
 	String monitorHTTPUsername;
+	/***
+	 *  optional
+	 */
 	String monitorHTTPPassword;
+
+	/***
+	 * optional Multiple alertContactIDs can be sent like monitorAlertContacts(457,373,8956)
+	 */
 	List<String> monitorAlertContacts;
 
 	public static class MonitorParameterBuilder {
@@ -100,7 +137,11 @@ class MonitorParameter {
 
 	def asMap(){
 		def map =[:]
-		def filtered = ['class', 'active', 'metaClass']
+		def filtered = [
+			'class',
+			'active',
+			'metaClass'
+		]
 		this.properties.collect{it}.findAll{
 			if(it.value !=null){
 				!filtered.contains(it.key)
