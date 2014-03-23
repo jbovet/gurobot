@@ -24,7 +24,7 @@ package org.gurobot.client
  *
  */
 class GURobotClientException extends Exception {
-	
+
 	private String errorCode = "Unknown_Exception";
 
 	GURobotClientException(String code, String message){
@@ -35,5 +35,8 @@ class GURobotClientException extends Exception {
 	GURobotClientException(Throwable e){
 		super(e)
 	}
-	
+
+	GURobotClientException(String message, Throwable e) {
+		super(message, e)
+	}
 }

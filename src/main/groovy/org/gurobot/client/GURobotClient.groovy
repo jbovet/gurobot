@@ -73,15 +73,17 @@ class GURobotClient {
 	 * @query parameters
 	 * @return response
 	 */
-	private Response call(path, Map query =[:]) throws GURobotClientException {
+	private JSONObject call(path, Map query =[:]) throws GURobotClientException {
+		def response 
 		try {
 			query << ['format':'json','noJsonCallback':1]
-			onResponse(restClient.get(path: path, query:query))
+			response  = onResponse(restClient.get(path: path, query:query))
 		} catch (HTTPClientException hce) {
 			throw new GURobotClientException("Problems communicating with: $path", hce)
 		} catch(GURobotClientException gre){
 			throw new GURobotClientException(gre)
 		}
+		return response
 	}
 
 	/***
@@ -116,7 +118,7 @@ class GURobotClient {
 
 		if(showTimeZone) params << ['showTimeZone':showTimeZone?1:0]
 
-		def response =  call("getMonitors?apiKey=${apikey}", params).json
+		def response =  call("getMonitors?apiKey=${apikey}", params)
 		def monitor = response.monitors.monitor
 		monitor.each(){ data ->
 			monitorList << parseMonitor(data)
@@ -196,7 +198,7 @@ class GURobotClient {
 		if(!list?.isEmpty())
 			params << ["monitorAlertContacts":list]
 
-		def response =  call("newMonitor?apiKey=${apikey}", params).json
+		def response =  call("newMonitor?apiKey=${apikey}", params)
 
 		return response.monitor.id.toInteger()
 	}
@@ -208,7 +210,7 @@ class GURobotClient {
 			params << ["monitorID":id]
 		}
 		def response = call("deleteMonitor?apiKey=${apikey}",params)
-		return response.monitor
+		return response.monitor.id.toInteger()
 	}
 
 
@@ -225,7 +227,7 @@ class GURobotClient {
 		if(id){
 			params << ["monitors":id]
 		}
-		def response =  call("getMonitors?apiKey=${apikey}", params).json
+		def response =  call("getMonitors?apiKey=${apikey}", params)
 		parseMonitor(response.monitors.monitor.first())
 	}
 
@@ -283,14 +285,9 @@ class GURobotClient {
 
 
 	private List getAlerts(data) {
-		def alerts = []
-		if(data.response.contentType?.startsWith('text/')){
-			JSONObject json = new JSONObject(data.text)
-			alerts = json.alertcontacts.alertcontact
-		}else
-			alerts = data.alertcontacts.alertcontact
-
+		def alerts =  data.alertcontacts.alertcontact
 		def alertcontacts = []
+
 		alerts.each(){ alert ->
 			alertcontacts << parseAlertContact(alert)
 		}
@@ -322,10 +319,17 @@ class GURobotClient {
 		alertsContact
 	}
 
-	def onResponse(response) throws GURobotClientException{
-		def data = response.json
-		if(data?.stat == 'fail') onError(data)
-		return response
+	def onResponse(data) throws GURobotClientException{
+		def json
+
+		if(data.response.contentType?.startsWith('text/')){
+			json = new JSONObject(data.text)
+		}else{
+			json = data.json
+		}
+		
+		if(json?.stat == 'fail') onError(json)
+		return json
 	}
 
 	def onError(data){

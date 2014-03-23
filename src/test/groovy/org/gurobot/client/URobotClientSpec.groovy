@@ -119,13 +119,13 @@ class URobotClientSpec extends Specification {
 		def m = createMonitor().monitorFriendlyName("api-test104").monitorURL("http://www.inacap.cl").build()
 		when:
 		def id  = gurobotClient.newMonitor(m)
-		gurobotClient.deleteMonitor(id)
+		def monitor = gurobotClient.deleteMonitor(id)
 
 		then:
-		id > 0
+		monitor > 0
 
 	}
-	
+
 	void "should retrieve a GURobotClientException when delete a monitor"(){
 		when:
 		gurobotClient.deleteMonitor(123)
@@ -133,7 +133,7 @@ class URobotClientSpec extends Specification {
 		then:
 		def e = thrown (GURobotClientException)
 		e.cause
-		
+
 	}
 
 	void "should retrieve list of alert contacts"() {
