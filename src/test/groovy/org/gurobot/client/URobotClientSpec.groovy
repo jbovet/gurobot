@@ -37,7 +37,7 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = ""
+	def apiKey = "u121322-021b5cd9f36e49a637df719e"
 
 	void setup(){
 		def api = "http://api.uptimerobot.com"
@@ -89,18 +89,15 @@ class URobotClientSpec extends Specification {
 		monitor.type in MonitorType.values()
 	}
 
-	void "should add new monitor"(){
-		MonitorParameter m = new MonitorParameterBuilder()
-				.monitorFriendlyName("api-test9")
-				.monitorURL("http://duoc.cl")
+	def createMonitor(){
+		new MonitorParameterBuilder()
 				.monitorType(MonitorType.HTTP)
-				.monitorSubType(SubType.HTTPS)
-				.monitorKeywordType(KeywordType.NOT_EXISTS)
-				.monitorKeywordValue("blah!")
 				.monitorHTTPUsername("pepe")
 				.monitorHTTPPassword("pepe".reverse())
-				.build()
+	}
 
+	void "should add new monitor"(){
+		def m = createMonitor().monitorFriendlyName("api-test102").monitorURL("http://www.duoc.cl").build()
 		when:
 		def id  = gurobotClient.newMonitor(m)
 
@@ -109,12 +106,7 @@ class URobotClientSpec extends Specification {
 	}
 
 	void "should add new monitor with alerts contacts"() {
-		MonitorParameter m = new MonitorParameterBuilder()
-				.monitorFriendlyName("api-test10")
-				.monitorURL("http://www.duoc.cl")
-				.monitorType(MonitorType.HTTP)
-				.monitorAlertContacts(["2253041","0121322"])
-				.build()
+		def m = createMonitor().monitorFriendlyName("api-test101").monitorURL("http://duoc.cl").monitorAlertContacts(["2253041", "0121322"]).build();
 
 		when:
 		def id  = gurobotClient.newMonitor(m)
@@ -123,8 +115,26 @@ class URobotClientSpec extends Specification {
 		id > 0
 	}
 
+	void "should remove monitor"(){
+		def m = createMonitor().monitorFriendlyName("api-test104").monitorURL("http://www.inacap.cl").build()
+		when:
+		def id  = gurobotClient.newMonitor(m)
+		gurobotClient.deleteMonitor(id)
 
+		then:
+		id > 0
 
+	}
+	
+	void "should retrieve a GURobotClientException when delete a monitor"(){
+		when:
+		gurobotClient.deleteMonitor(123)
+
+		then:
+		def e = thrown (GURobotClientException)
+		e.cause
+		
+	}
 
 	void "should retrieve list of alert contacts"() {
 		when:

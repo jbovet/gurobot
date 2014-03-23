@@ -76,9 +76,11 @@ class GURobotClient {
 	private Response call(path, Map query =[:]) throws GURobotClientException {
 		try {
 			query << ['format':'json','noJsonCallback':1]
-			restClient.get(path: path, query:query)
+			onResponse(restClient.get(path: path, query:query))
 		} catch (HTTPClientException hce) {
 			throw new GURobotClientException("Problems communicating with: $path", hce)
+		} catch(GURobotClientException gre){
+			throw new GURobotClientException(gre)
 		}
 	}
 
@@ -93,7 +95,7 @@ class GURobotClient {
 	 * @return
 	 * @throws GURobotClientException
 	 */
-	List<Monitor> getMonitors(List monitors = [], boolean log, boolean alertcontacts, boolean responseTimes, boolean responseTimesAverage, boolean showMonitorAlertContacts, boolean showTimeZone) throws GURobotClientException {
+	List<Monitor> getMonitors(List<Integer> monitors = [], boolean log, boolean alertcontacts, boolean responseTimes, boolean responseTimesAverage, boolean showMonitorAlertContacts, boolean showTimeZone) throws GURobotClientException {
 		def monitorList =[]
 		def params= [:]
 
@@ -131,7 +133,7 @@ class GURobotClient {
 	 * @return
 	 * @throws GURobotClientException
 	 */
-	List<Monitor> getMonitors(List monitors =[], boolean log, boolean alertcontacts, boolean responseTimes) throws GURobotClientException {
+	List<Monitor> getMonitors(List<Integer> monitors =[], boolean log, boolean alertcontacts, boolean responseTimes) throws GURobotClientException {
 		getMonitors(monitors, log, alertcontacts,responseTimes, false, false, false);
 	}
 
@@ -142,7 +144,7 @@ class GURobotClient {
 	 * @return
 	 * @throws GURobotClientException
 	 */
-	List<Monitor> getMonitors(List monitors = [], boolean alertcontacts) throws GURobotClientException {
+	List<Monitor> getMonitors(List<Integer> monitors = [], boolean alertcontacts) throws GURobotClientException {
 		getMonitors(monitors, true, alertcontacts, false, false, false,false)
 	}
 
@@ -162,17 +164,17 @@ class GURobotClient {
 	 * @return logs and alerts contacts
 	 * @throws GURobotClientException
 	 */
-	List<Monitor> getMonitors(List monitors) throws GURobotClientException {
+	List<Monitor> getMonitors(List<Integer> monitors) throws GURobotClientException {
 		getMonitors(monitors,true, true,false, false, false,false);
 	}
 
 	/***
 	 * 
 	 * @param monitorParameter
-	 * @return
+	 * @return the id for new Monitor
 	 * @throws GURobotClientException
 	 */
-	int newMonitor(MonitorParameter monitorParameter) throws GURobotClientException{
+	Integer newMonitor(MonitorParameter monitorParameter) throws GURobotClientException{
 		def params = monitorParameter.asMap()
 		if(monitorParameter?.monitorType == MonitorType.PORT.value() && SubType.byId(monitorParameter?.monitorSubType) in SubType.values())
 			params['monitorSubType'] = monitorParameter?.monitorSubType
@@ -194,11 +196,21 @@ class GURobotClient {
 		if(!list?.isEmpty())
 			params << ["monitorAlertContacts":list]
 
-		print "params=> "+params
 		def response =  call("newMonitor?apiKey=${apikey}", params).json
-		print response
+
 		return response.monitor.id.toInteger()
 	}
+
+
+	Integer deleteMonitor(Integer id) throws GURobotClientException{
+		def params= [:]
+		if(id){
+			params << ["monitorID":id]
+		}
+		def response = call("deleteMonitor?apiKey=${apikey}",params)
+		return response.monitor
+	}
+
 
 
 	/***
@@ -208,7 +220,7 @@ class GURobotClient {
 	 * @return monitor
 	 */
 	@Deprecated
-	Monitor getMonitorFor(int id){
+	Monitor getMonitorFor(int id) throws GURobotClientException{
 		def params= [:]
 		if(id){
 			params << ["monitors":id]
@@ -259,7 +271,7 @@ class GURobotClient {
 	 * Get alert contacts list by id(s)
 	 * @return
 	 */
-	List<AlertContact> getAlertContacts(List ids = []){
+	List<AlertContact> getAlertContacts(List<String> ids = []) throws GURobotClientException{
 		def params= [:]
 
 		if(!ids.isEmpty()){
@@ -308,5 +320,15 @@ class GURobotClient {
 			alertsContact << alert
 		}
 		alertsContact
+	}
+
+	def onResponse(response) throws GURobotClientException{
+		def data = response.json
+		if(data?.stat == 'fail') onError(data)
+		return response
+	}
+
+	def onError(data){
+		throw new GURobotClientException(data.id,data.message)
 	}
 }

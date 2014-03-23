@@ -23,16 +23,17 @@ package org.gurobot.client
  * @author josebovet
  *
  */
-class GURobotClientException extends Throwable {
-	GURobotClientException(String message){
+class GURobotClientException extends Exception {
+	
+	private String errorCode = "Unknown_Exception";
+
+	GURobotClientException(String code, String message){
 		super(message)
+		this.errorCode =  code
 	}
 
 	GURobotClientException(Throwable e){
 		super(e)
 	}
-
-	GURobotClientException(String message, Throwable e) {
-		super(message, e)
-	}
+	
 }
