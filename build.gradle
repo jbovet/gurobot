@@ -13,18 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-  apply plugin: 'groovy'
-  apply plugin: 'eclipse'
+
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
 
 
-  repositories {
-      mavenCentral()
-    }
+repositories {
+    jcenter()
+}
 
-  dependencies {
-      compile "org.codehaus.groovy:groovy-all:2.2.2"
-      compile "com.github.groovy-wslite:groovy-wslite:0.8.0"
-      testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
-			testCompile "cglib:cglib-nodep:3.1"
-  }
+dependencies {
+	compile "org.codehaus.groovy:groovy-all:2.2.2"
+	compile "com.github.groovy-wslite:groovy-wslite:0.8.0"
+	testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+	testCompile "cglib:cglib-nodep:3.1"
+}
+
+task sourceJar(type: Jar) {
+	group 'Build'
+	description 'An archive of the source code'
+	classifier 'sources'
+	from sourceSets.main.allSource
+}
+
+artifacts { sourceJar }
