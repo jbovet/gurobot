@@ -37,11 +37,10 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = "u121322-021b5cd9f36e49a637df719e"
+	def apiKey = 'u121322-021b5cd9f36e49a637df719e'
 
 	void setup(){
-		def api = "http://api.uptimerobot.com"
-		gurobotClient = GURobotClient.instance(api,apiKey)
+		gurobotClient = GURobotClient.instance(apiKey)
 	}
 
 	void "should retrieve list of monitors with logs"() {

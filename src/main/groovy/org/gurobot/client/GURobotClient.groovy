@@ -52,16 +52,16 @@ class GURobotClient {
 
 	RESTClient restClient
 
-	static apikey = ""
+	static apikey
 
 	static LIST_SEPARATOR = "-"
 
 	private GURobotClient() {
 	}
 
-	static GURobotClient instance(String apiUrl = DEFAULT_API, String apiKey){
+	static GURobotClient instance(String apiKey){
 		apikey = apiKey
-		new GURobotClient(restClient: new RESTClient(apiUrl))
+		new GURobotClient(restClient: new RESTClient(DEFAULT_API))
 	}
 
 	/***
