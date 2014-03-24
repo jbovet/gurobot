@@ -59,7 +59,13 @@ class GURobotClient {
 	private GURobotClient() {
 	}
 
+	/***
+	 * Instance for GURobotClient
+	 * @param apiKey
+	 * @return
+	 */
 	static GURobotClient instance(String apiKey){
+		assert apiKey : 'apiKey is required...'
 		apikey = apiKey
 		new GURobotClient(restClient: new RESTClient(DEFAULT_API))
 	}
