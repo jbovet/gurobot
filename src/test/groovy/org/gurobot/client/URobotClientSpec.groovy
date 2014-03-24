@@ -96,26 +96,7 @@ class URobotClientSpec extends Specification {
 				.monitorHTTPPassword("pepe".reverse())
 	}
 
-	void "should add new monitor"(){
-		def m = createMonitor().monitorFriendlyName("api-test102").monitorURL("http://www.duoc.cl").build()
-		when:
-		def id  = gurobotClient.newMonitor(m)
-
-		then:
-		id > 0
-	}
-
-	void "should add new monitor with alerts contacts"() {
-		def m = createMonitor().monitorFriendlyName("api-test101").monitorURL("http://duoc.cl").monitorAlertContacts(["2253041", "0121322"]).build();
-
-		when:
-		def id  = gurobotClient.newMonitor(m)
-
-		then:
-		id > 0
-	}
-
-	void "should remove monitor"(){
+	void "should add and remove monitor"(){
 		def m = createMonitor().monitorFriendlyName("api-test104").monitorURL("http://www.inacap.cl").build()
 		when:
 		def id  = gurobotClient.newMonitor(m)
@@ -124,6 +105,10 @@ class URobotClientSpec extends Specification {
 		then:
 		monitor > 0
 
+	}
+
+	void "should edit monitor"(){
+		//TODO
 	}
 
 	void "should retrieve a GURobotClientException when delete a monitor"(){
@@ -141,24 +126,16 @@ class URobotClientSpec extends Specification {
 		def alerts = gurobotClient.getAlertContacts()
 
 		then:
-		alerts.size() == 2
+		print alerts
+		alerts.size() > 0
 	}
 
-	void "should retrieve one alert contacts"() {
+	void "should create and delete alert contact"(){
 		when:
-		def alert = gurobotClient.getAlertContacts([2253041]).first()
+		def id = gurobotClient.newAlertContact(AlertType.EMAIL, "jb@mail.com")
+		def deletedAlertContact = gurobotClient.deleteAlertContact(id)
 
 		then:
-		alert.status == AlertStatus.ACTIVE
-		alert.type == AlertType.TWITTER
-	}
-
-	void "should retrieve two alert contacts"() {
-		when:
-		def ids = ["2253041", "0121322"]
-		def alerts = gurobotClient.getAlertContacts(ids)
-
-		then:
-		alerts.size() == 2
+		deletedAlertContact == id
 	}
 }

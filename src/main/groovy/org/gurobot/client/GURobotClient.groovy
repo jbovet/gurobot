@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/**
- *
- */
 package org.gurobot.client
 
 import java.text.DateFormat;
@@ -74,7 +71,7 @@ class GURobotClient {
 	 * @return response
 	 */
 	private JSONObject call(path, Map query =[:]) throws GURobotClientException {
-		def response 
+		def response
 		try {
 			query << ['format':'json','noJsonCallback':1]
 			response  = onResponse(restClient.get(path: path, query:query))
@@ -284,6 +281,35 @@ class GURobotClient {
 	}
 
 
+	/***
+	 * New alert contacts 
+	 * @param type required
+	 * @param alertContactValue required
+	 * @return
+	 * @throws GURobotClientException
+	 */
+	String newAlertContact(AlertType type, String alertContactValue) throws GURobotClientException{
+		assert type
+		assert alertContactValue
+		def params = ["alertContactType":type.value(), "alertContactValue":alertContactValue]
+		def response = call("newAlertContact?apiKey=${apikey}",params)
+		return response.alertcontact.id
+	}
+
+
+	/***
+	 * Delete alert contact
+	 * @param alertContactId
+	 * @return id removed
+	 * @throws GURobotClientException
+	 */
+	String deleteAlertContact(String alertContactId) throws GURobotClientException{
+		assert alertContactId
+		def params = ["alertContactID":alertContactId]
+		def response = call("deleteAlertContact?apiKey=${apikey}",params)
+		return response.alertcontact.id
+	}
+
 	private List getAlerts(data) {
 		def alerts =  data.alertcontacts.alertcontact
 		def alertcontacts = []
@@ -327,7 +353,7 @@ class GURobotClient {
 		}else{
 			json = data.json
 		}
-		
+
 		if(json?.stat == 'fail') onError(json)
 		return json
 	}
