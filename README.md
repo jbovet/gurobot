@@ -1,16 +1,19 @@
 
 ###GURobot - Groovy Uptime Robot API Client
 
-Groovy Uptime Robot http://uptimerobot.com client for groovy/java, it wraps some api calls to uptime robot.
+Groovy Uptime Robot http://uptimerobot.com client for groovy/java, it wraps some api calls from uptimerobot.com
 
-Prerequisites
+Prerequisites:
 
 	groovy-all:2.2.2
 	groovy-wslite:0.8.0	
 
-Installation
+Installation:
 
-	download jar version from: https://bintray.com/josebovet/GURobot/GURobot/
+Download from Bintray site[ ![Download](https://api.bintray.com/packages/josebovet/GURobot/GURobot/images/download.png) ](https://bintray.com/josebovet/GURobot/GURobot/_latestVersion)
+
+gurobot in https://bintray.com/josebovet/GURobot/GURobot/
+	 
 
 Usage:
 
@@ -21,3 +24,4 @@ Usage:
 	monitors = gurobotClient.getMonitors(...)
 
 Contribute
+;)
