@@ -31,6 +31,10 @@ class GURobotClientException extends Exception {
 		super(message)
 		this.errorCode =  code
 	}
+	
+	GURobotClientException(String message){
+		super(message)
+	}
 
 	GURobotClientException(Throwable e){
 		super(e)

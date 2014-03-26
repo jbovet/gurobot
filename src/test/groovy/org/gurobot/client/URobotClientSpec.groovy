@@ -21,10 +21,12 @@ package org.gurobot.client
 
 import org.gurobot.client.alerts.AlertStatus
 import org.gurobot.client.alerts.AlertType
+import org.gurobot.client.monitors.EditMonitorParameter.EditMonitorParameterBuilder;
 import org.gurobot.client.monitors.KeywordType;
 import org.gurobot.client.monitors.MonitorParameter
 import org.gurobot.client.monitors.MonitorType
 import org.gurobot.client.monitors.MonitorParameter.MonitorParameterBuilder
+import org.gurobot.client.monitors.Status;
 import org.gurobot.client.monitors.SubType;
 
 import spock.lang.Specification
@@ -37,7 +39,7 @@ class URobotClientSpec extends Specification {
 
 	GURobotClient gurobotClient
 
-	def apiKey = 'u121322-021b5cd9f36e49a637df719e'
+	def apiKey = ''
 
 	void setup(){
 		gurobotClient = GURobotClient.instance(apiKey)
@@ -106,10 +108,6 @@ class URobotClientSpec extends Specification {
 
 	}
 
-	void "should edit monitor"(){
-		//TODO
-	}
-
 	void "should retrieve a GURobotClientException when delete a monitor"(){
 		when:
 		gurobotClient.deleteMonitor(123)
@@ -125,7 +123,6 @@ class URobotClientSpec extends Specification {
 		def alerts = gurobotClient.getAlertContacts()
 
 		then:
-		print alerts
 		alerts.size() > 0
 	}
 
@@ -137,4 +134,34 @@ class URobotClientSpec extends Specification {
 		then:
 		deletedAlertContact == id
 	}
+
+	void "should edit monitor"(){
+		def m = new EditMonitorParameterBuilder()
+				.monitorID(776025715)
+				.monitorFriendlyName("JIRAC")
+				.monitorStatus(Status.NOT_CHECKED)
+				.build()
+
+		when:
+		def id = gurobotClient.editMonitor(m)
+
+		then:
+		id > 0
+
+	}
+	void "should retrieve a GURobotClientException when edit and put invalid status monitor"(){
+		def m = new EditMonitorParameterBuilder()
+				.monitorID(776025715)
+				.monitorStatus(Status.UP)
+				.build()
+
+		when:
+		def id = gurobotClient.editMonitor(m)
+
+		then:
+		def e = thrown (GURobotClientException)
+		e
+	}
+
+
 }

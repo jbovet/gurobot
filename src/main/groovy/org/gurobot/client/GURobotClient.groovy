@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ import org.gurobot.client.alerts.AlertStatus;
 import org.gurobot.client.alerts.AlertType;
 import org.gurobot.client.logs.Log;
 import org.gurobot.client.logs.LogType;
+import org.gurobot.client.monitors.EditMonitorParameter;
 import org.gurobot.client.monitors.KeywordType;
 import org.gurobot.client.monitors.Monitor;
 import org.gurobot.client.monitors.MonitorParameter;
@@ -183,18 +184,13 @@ class GURobotClient {
 		def params = monitorParameter.asMap()
 		if(monitorParameter?.monitorType == MonitorType.PORT.value() && SubType.byId(monitorParameter?.monitorSubType) in SubType.values())
 			params['monitorSubType'] = monitorParameter?.monitorSubType
-		else params.remove('monitorSubType')
 
 		if(monitorParameter?.monitorType == MonitorType.PORT.value() && monitorParameter?.monitorPort)
 			params['monitorPort'] = monitorParameter?.monitorPort
-		else params.remove('monitorPort')
 
 		if(monitorParameter?.monitorKeywordType == KeywordType.EXISTS.value() && monitorParameter?.monitorKeywordValue){
 			params['monitorKeywordType'] = monitorParameter?.monitorKeywordType
 			params['monitorKeywordValue'] = monitorParameter?.monitorKeywordValue
-		}else{
-			params.remove('monitorKeywordType')
-			params.remove('monitorKeywordValue')
 		}
 
 		def list = monitorParameter?.monitorAlertContacts?.join('-')
@@ -206,7 +202,12 @@ class GURobotClient {
 		return response.monitor.id.toInteger()
 	}
 
-
+	/***
+	 * Delete monitor 
+	 * @param id monitor 
+	 * @return id monitor deleted
+	 * @throws GURobotClientException
+	 */
 	Integer deleteMonitor(Integer id) throws GURobotClientException{
 		def params= [:]
 		if(id){
@@ -217,15 +218,61 @@ class GURobotClient {
 	}
 
 
+	/***
+	 * Edit monitor data
+	 * @param editMonitorParameter
+	 * @return id monitor edited
+	 * @throws GURobotClientException
+	 */
+	Integer editMonitor(EditMonitorParameter editMonitorParameter) throws GURobotClientException{
+		assert editMonitorParameter.monitorID : 'monitor id is required'
+		def params = editMonitorParameter.asMap()
+
+		//get monitor
+		def monitor = getMonitorFor(editMonitorParameter.monitorID)
+
+		if(editMonitorParameter?.monitorStatus.toString() && Status.byId(editMonitorParameter?.monitorStatus) in [
+			Status.PAUSED,
+			Status.NOT_CHECKED
+		]){
+			//TODO empty value for paramater 0 in wslite???
+			params['monitorStatus'] = editMonitorParameter?.monitorStatus?.toString()
+		}else throw new GURobotClientException('The monitorStatus should be PAUSED or NOT CHECKED')
+
+		if(editMonitorParameter?.monitorType && editMonitorParameter?.monitorType == MonitorType.PORT.value()
+		&& monitor?.type == MonitorType.HTTP.value())
+			throw new GURobotClientException('The type of a monitor can not be edited, deleting the monitor and re-creating a new one is adviced.')
+		else params['monitorType'] = editMonitorParameter?.monitorType
+
+		if(editMonitorParameter?.monitorSubType && SubType.byId(editMonitorParameter?.monitorSubType) in SubType.values())
+			params['monitorSubType'] = editMonitorParameter?.monitorSubType
+
+		if(editMonitorParameter?.monitorPort && editMonitorParameter?.monitorType == MonitorType.PORT.value())
+			params['monitorPort'] = editMonitorParameter?.monitorPort
+
+		if(editMonitorParameter?.monitorKeywordType && KeywordType.byId(editMonitorParameter?.monitorKeywordType) in KeywordType.values())
+			params['monitorKeywordType'] = editMonitorParameter?.monitorKeywordType
+
+		if(editMonitorParameter.monitorHTTPUsername && editMonitorParameter.monitorHTTPUsername.isEmpty())
+			params['monitorHTTPUsername'] = ''
+
+		if(editMonitorParameter.monitorHTTPPassword && editMonitorParameter.monitorHTTPPassword.isEmpty())
+			params['monitorHTTPPassword'] = ''
+
+		if(editMonitorParameter.monitorAlertContacts && editMonitorParameter.monitorAlertContacts.isEmpty())
+			params['monitorAlertContacts'] = ''
+
+		def editedMonitor = call("editMonitor?apiKey=${apikey}", params)
+
+		return editedMonitor.monitor.id.toInteger()
+	}
 
 	/***
 	 * Get monitor for Id
-	 * @deprecated use {@link getMonitors(List ids)}
 	 * @param id
 	 * @return monitor
 	 */
-	@Deprecated
-	Monitor getMonitorFor(int id) throws GURobotClientException{
+	Monitor getMonitorFor(Integer id) throws GURobotClientException{
 		def params= [:]
 		if(id){
 			params << ["monitors":id]
@@ -297,7 +344,7 @@ class GURobotClient {
 	String newAlertContact(AlertType type, String alertContactValue) throws GURobotClientException{
 		assert type
 		assert alertContactValue
-		def params = ["alertContactType":type.value(), "alertContactValue":alertContactValue]
+		def params = ["alertContactType":type?.value()?.toString(), "alertContactValue":alertContactValue]
 		def response = call("newAlertContact?apiKey=${apikey}",params)
 		return response.alertcontact.id
 	}
