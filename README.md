@@ -5,7 +5,7 @@ Groovy Uptime Robot http://uptimerobot.com client for groovy/java, it wraps some
 
 Prerequisites:
 
-	groovy-all:2.2.2
+	groovy-all:2.3.0
 	groovy-wslite:0.8.0	
 
 Installation:
